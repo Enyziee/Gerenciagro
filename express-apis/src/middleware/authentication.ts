@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { verify } from 'jsonwebtoken';
+import { validadeJWT } from '../modules/authentication';
 
 export async function checkJWT(req: Request, res: Response, next: NextFunction) {
 	const bearer = req.headers.authorization;
@@ -19,7 +19,8 @@ export async function checkJWT(req: Request, res: Response, next: NextFunction) 
 	}
 
 	try {
-		const user = verify(token, process.env.JWT_TOKEN!);
+		const user = await validadeJWT(token);
+		console.log(user);
 		res.locals.user = user;
 		next();
 	} catch (error) {

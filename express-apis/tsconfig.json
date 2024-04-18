@@ -2,8 +2,7 @@
 	"extends": "@tsconfig/node21/tsconfig.json",
 	"compilerOptions": {
 		"strict": true,
-		"baseUrl": "src",
-		"outDir": "dist",
+		"outDir": "./dist",
 		"noImplicitAny": true,
 		"sourceMap": true,
 		"pretty": true
