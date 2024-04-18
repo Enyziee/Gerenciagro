@@ -17,14 +17,13 @@ export class User {
 export class UserRepository {
 	private constructor() {}
 
-	public static async save(entity: User): Promise<boolean> {
+	public static async create(entity: User): Promise<boolean> {
 		const query = {
 			text: 'INSERT INTO Users (id, email, name, password) VALUES ($1, $2, $3, $4)',
 			values: [entity.id, entity.email, entity.name, entity.password],
 		};
 
-		const result = await db.query(query);
-		console.log(result);
+		await db.query(query);
 
 		return true;
 	}
@@ -36,16 +35,23 @@ export class UserRepository {
 		};
 
 		const result = await db.query(query);
-		return result.rows[0];
+		return new User(result.rows[0].id, result.rows[0].name, result.rows[0].email, result.rows[0].password);
 	}
 
-	public static async findAll() {
+	public static async findAll(): Promise<Array<User>> {
 		const query = {
 			text: 'SELECT * FROM Users',
 		};
 
 		const results = await db.query(query);
 
-		return results.rows;
+		const users = new Array<User>();
+
+		results.rows.forEach((row) => {
+			const user = new User(row.id, row.name, row.email, '');
+			users.push(user);
+		});
+
+		return users;
 	}
 }
