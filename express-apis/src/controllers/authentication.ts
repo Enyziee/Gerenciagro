@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
-import { UserRepository } from '../models/user';
 
 import bcrypt from 'bcrypt';
 import { createJWT } from '../modules/authentication';
+import { AppDataSource } from '../db/AppDataSource';
+import { User } from '../entity/User';
+
+const userRepository = AppDataSource.getRepository(User);
 
 export async function singin(req: Request, res: Response) {
 	const { email, password } = req.body;
@@ -13,7 +16,9 @@ export async function singin(req: Request, res: Response) {
 	}
 
 	try {
-		const user = await UserRepository.findByEmail(email);
+		const user = await userRepository.findOneBy({
+			email: email,
+		});
 
 		if (!user) {
 			return res.status(401).json();

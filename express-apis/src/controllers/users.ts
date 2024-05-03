@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
-import { UserRepository, User } from '../models/user';
 import bcrypt from 'bcrypt';
+import { AppDataSource } from '../db/AppDataSource';
+import { User } from '../entity/User';
+
+const userRepository = AppDataSource.getRepository(User);
 
 export async function createUser(req: Request, res: Response) {
 	const { name, email, password } = req.body;
@@ -12,7 +15,9 @@ export async function createUser(req: Request, res: Response) {
 		return res.status(400).json({ error: 'Missing Credentials' });
 	}
 
-	const userExists = await UserRepository.findByEmail(email);
+	const userExists = await userRepository.findOneBy({
+		email: email,
+	});
 
 	if (userExists) {
 		console.warn('User already created');
@@ -23,9 +28,12 @@ export async function createUser(req: Request, res: Response) {
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
 
-		const user = new User(crypto.randomUUID(), name, email, hashedPassword);
+		const user = new User();
+		user.fullName = name;
+		user.email = email;
+		user.password = hashedPassword;
 
-		await UserRepository.create(user);
+		await userRepository.save(user);
 		return res.status(201).json();
 	} catch (error) {
 		console.error(error);
@@ -38,7 +46,7 @@ export async function getUserInfo(req: Request, res: Response) {
 }
 
 export async function showAllUsers(req: Request, res: Response) {
-	const users = await UserRepository.findAll();
+	const users = await userRepository.findAndCount();
 
 	res.status(200).json({ content: users });
 }
