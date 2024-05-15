@@ -1,14 +1,17 @@
 {
-	"extends": "@tsconfig/node21/tsconfig.json",
 	"compilerOptions": {
 		"strict": true,
-		"outDir": "./dist",
-		"noImplicitAny": true,
-		"sourceMap": true,
-		"pretty": true,
-
+		"target": "ES2022",
+		"module": "commonjs",
+		"moduleResolution": "node",
 		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true
+		"experimentalDecorators": true,
+		"esModuleInterop": true,
+		"declaration": true,
+		"sourceMap": true,
+		"allowSyntheticDefaultImports": true,
+		"removeComments": true,
+		"outDir": "./dist"
 	},
 	"include": ["src/**/*"]
 }
