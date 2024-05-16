@@ -6,10 +6,10 @@
 	"scripts": {
 		"build": "npx tsc",
 		"dev": "npx tsc && node --require dotenv/config ./dist/app.js",
-		"typeorm:generate": "npx typeorm-ts-node-commonjs migration:generate src/db/migrations/migration -d src/db/AppDataSource.ts",
-		"typeorm:migrate": "npx typeorm-ts-node-commonjs migration:run -d src/db/AppDataSource.ts",
-		"typeorm:revert": "npx typeorm-ts-node-commonjs migration:revert -d src/db/AppDataSource.ts",
-		"typeorm:drop": "npx typeorm-ts-node-commonjs schema:drop -d src/db/AppDataSource.ts"
+		"typeorm:generate": "npx typeorm-ts-node-commonjs migration:generate src/db/migrations/migration -d src/db/DataSource.ts",
+		"typeorm:migrate": "npx typeorm-ts-node-commonjs migration:run -d src/db/DataSource.ts",
+		"typeorm:revert": "npx typeorm-ts-node-commonjs migration:revert -d src/db/DataSource.ts",
+		"typeorm:drop": "npx typeorm-ts-node-commonjs schema:drop -d src/db/DataSource.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -17,6 +17,7 @@
 	"devDependencies": {
 		"@tsconfig/node21": "^21.0.1",
 		"@types/bcrypt": "^5.0.2",
+		"@types/cors": "^2.8.17",
 		"@types/express": "^4.17.21",
 		"@types/jsonwebtoken": "^9.0.6",
 		"@types/morgan": "^1.9.9",
@@ -33,7 +34,6 @@
 		"typescript": "^5.4.2"
 	},
 	"dependencies": {
-		"@types/cors": "^2.8.17",
 		"bcrypt": "^5.1.1",
 		"body-parser": "^1.20.2",
 		"cors": "^2.8.5",

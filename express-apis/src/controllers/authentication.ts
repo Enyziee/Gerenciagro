@@ -1,11 +1,12 @@
+import bcrypt from 'bcrypt';
+import DataSource from '../db/DataSource';
+
 import { Request, Response } from 'express';
 
-import bcrypt from 'bcrypt';
 import { createJWT } from '../modules/authentication';
-import { AppDataSource } from '../db/AppDataSource';
 import { User } from '../entity/User';
 
-const userRepository = AppDataSource.getRepository(User);
+const userRepository = DataSource.getRepository(User);
 
 export async function singin(req: Request, res: Response) {
 	const { email, password } = req.body;

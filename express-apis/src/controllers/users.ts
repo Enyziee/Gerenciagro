@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { AppDataSource } from '../db/AppDataSource';
+import DataSource from '../db/DataSource';
 import { User } from '../entity/User';
 
-const userRepository = AppDataSource.getRepository(User);
+const userRepository = DataSource.getRepository(User);
 
 export async function createUser(req: Request, res: Response) {
 	const { name, email, password } = req.body;
@@ -29,7 +29,7 @@ export async function createUser(req: Request, res: Response) {
 		const hashedPassword = await bcrypt.hash(password, salt);
 
 		const user = new User();
-		user.fullName = name;
+		user.name = name;
 		user.email = email;
 		user.password = hashedPassword;
 

@@ -1,19 +1,23 @@
-import { json } from 'body-parser';
+import cors from 'cors';
 import express from 'express';
-import { AppDataSource } from './db/AppDataSource';
-
-import routes from './routes';
 import morgan from 'morgan';
-const PORT = process.env.EXPRESS_PORT;
+
+import { json } from 'body-parser';
+import 'reflect-metadata';
+
+import DataSource from './db/DataSource';
+import routes from './routes/index';
+
+const PORT = process.env.EXPRESS_PORT ? process.env.EXPRESS_PORT : 8080;
 const app = express();
 
 app.use(morgan('dev'));
-// app.use(cors());
+app.use(cors());
 app.use(json());
 
 app.use('/api', routes());
 
-AppDataSource.initialize()
+DataSource.initialize()
 	.then(async () => {
 		app.listen(PORT, async () => {
 			console.log(`Server listening on http://localhost:${PORT}`);
