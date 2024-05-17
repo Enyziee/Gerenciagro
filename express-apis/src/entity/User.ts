@@ -7,16 +7,19 @@ export class User {
 	id!: string;
 
 	@Column({
-		type: 'char',
-		length: 255,
+		type: 'varchar',
+		length: 256,
 	})
 	email!: string;
 
-	@Column('char')
-	fullName!: string;
+	@Column({
+		type: 'varchar',
+		length: 256,
+	})
+	name!: string;
 
 	@Column({
-		type: 'char',
+		type: 'varchar',
 		length: 60,
 	})
 	password!: string;

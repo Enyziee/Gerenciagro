@@ -21,4 +21,6 @@ RUN npm ci --production
 
 COPY --from=development /usr/src/app/dist ./dist
 
+ENV NODE_ENV=production
+
 CMD npx typeorm migration:run -d ./dist/db/DataSource.js && node dist/app.js
