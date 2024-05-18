@@ -6,7 +6,7 @@ export async function checkJWT(req: Request, res: Response, next: NextFunction) 
 
 	if (!bearer) {
 		res.status(401);
-		res.json({ message: 'not authorized' });
+		res.json({ message: 'Unauthorized' });
 		return;
 	}
 
@@ -14,18 +14,17 @@ export async function checkJWT(req: Request, res: Response, next: NextFunction) 
 
 	if (!token) {
 		res.status(401);
-		res.json({ message: 'not valid token' });
+		res.json({ message: 'Invalid Token' });
 		return;
 	}
 
 	try {
-		const user = await validadeJWT(token);
-		console.log(user);
-		res.locals.user = user;
+		const claims = await validadeJWT(token);
+		res.locals.claims = claims;
 		next();
 	} catch (error) {
 		console.error(error);
 		res.status(401);
-		res.json('not valid token');
+		res.json({ message: 'Invalid Token' });
 	}
 }

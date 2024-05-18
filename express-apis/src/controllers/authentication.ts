@@ -28,12 +28,12 @@ export async function singin(req: Request, res: Response) {
 		const validPassword = await bcrypt.compare(password, user.password);
 
 		if (!validPassword) {
-			return res.status(401).json('');
+			return res.status(401).json({ error: 'Invalid Credentials' });
 		}
 
-		const token = await createJWT(user.email);
+		const token = await createJWT(user);
 
-		return res.status(200).json({ token });
+		return res.status(200).json({ jwt_token: token });
 	} catch (error) {
 		console.error('Something go wrong\n', error);
 		return res.status(500).json({ error: 'Internal Error' });

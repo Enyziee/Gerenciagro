@@ -14,7 +14,7 @@ export class User {
 
 	@Column({
 		type: 'varchar',
-		length: 256,
+		length: 128,
 	})
 	name!: string;
 
@@ -23,6 +23,12 @@ export class User {
 		length: 60,
 	})
 	password!: string;
+
+	@Column({
+		type: 'varchar',
+		length: 64,
+	})
+	address!: string;
 
 	@CreateDateColumn()
 	creationDate!: string;
