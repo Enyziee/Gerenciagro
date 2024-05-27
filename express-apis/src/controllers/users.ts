@@ -5,7 +5,7 @@ import DataSource from '../db/DataSource';
 const userRepository = DataSource.getRepository(User);
 
 export async function showUserInfo(req: Request, res: Response) {
-	const userId: string = res.locals.claims.sub;
+	const userId: string = res.locals.claims.userid;
 
 	if (!userId) {
 		return res.status(401).json({ error: 'ID not provided' });
@@ -25,10 +25,4 @@ export async function showUserInfo(req: Request, res: Response) {
 
 	delete (user as { password?: string }).password;
 	return res.status(200).json({ content: user });
-}
-
-export async function showAllFarms(req: Request, res: Response) {
-	// TODO: Implementar o endpoints para mostrar todas as fazendas de um usuário
-
-	res.status(200).json({ message: 'Not implemented' });
 }

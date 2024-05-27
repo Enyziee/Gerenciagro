@@ -9,26 +9,19 @@ import { User } from '../entity/User';
 const userRepository = DataSource.getRepository(User);
 
 export async function login(req: Request, res: Response) {
-	const { email, password } = req.body;
-
-	if (!email || !password) {
-		console.warn('Missing credentials');
-		return res.status(400).json({ error: 'Missing Credentials' });
-	}
-
 	try {
 		const user = await userRepository.findOneBy({
-			email: email,
+			email: req.body.email,
 		});
 
 		if (!user) {
 			return res.status(401).json();
 		}
 
-		const validPassword = await bcrypt.compare(password, user.password);
+		const validPassword = await bcrypt.compare(req.body.password, user.password);
 
 		if (!validPassword) {
-			return res.status(401).json({ error: 'Invalid Credentials' });
+			return res.status(401).json({ errors: 'Invalid Credentials' });
 		}
 
 		const token = await createJWT(user);
@@ -44,12 +37,6 @@ export async function register(req: Request, res: Response) {
 	const { name, email, password, address } = req.body;
 
 	// TODO Adionar verificações extras para email;
-
-	if (!name || !email || !password || !address) {
-		console.log(`$Name: {name}, Email: ${email}, Password: ${password}, Address: ${address}`);
-		console.warn('Missing credentials');
-		return res.status(400).json({ error: 'Missing Credentials' });
-	}
 
 	const userExists = await userRepository.findOneBy({
 		email: email,
@@ -71,7 +58,10 @@ export async function register(req: Request, res: Response) {
 		user.password = hashedPassword;
 
 		await userRepository.save(user);
-		return res.status(201).json({ message: 'User created' });
+
+		const token = createJWT(user);
+
+		return res.status(201).json({ acess_token: token });
 	} catch (error) {
 		console.error(error);
 		return res.status(500).json({ error: 'Internal Error' });

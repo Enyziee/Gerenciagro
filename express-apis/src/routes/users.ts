@@ -1,12 +1,15 @@
-import { showAllFarms, showUserInfo } from '../controllers/users';
 import express from 'express';
+
+import { createNewFarm, showAllFarms, showFarm } from '../controllers/farms';
+import { showUserInfo } from '../controllers/users';
 import { checkJWT } from '../middleware/authentication';
-import { createNewFarm } from '../controllers/farms';
 
 export default (router: express.Router) => {
 	router.get('/users', checkJWT, showUserInfo);
 
-	router.post('/users/farms', checkJWT, createNewFarm);
+	router.post('/farms', checkJWT, createNewFarm);
 
-	router.get('/users/farms', checkJWT, showAllFarms);
+	router.get('/farms', checkJWT, showAllFarms);
+
+	router.get('/farms:id', checkJWT, showFarm);
 };
