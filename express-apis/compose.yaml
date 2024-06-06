@@ -4,14 +4,15 @@ services:
     environment:
       - POSTGRES_PASSWORD=root
     ports:
-      - '5432:5432'
+      - '5432'
 
   api:
     build: .
     ports:
-      - '8080:8080'
+      - '80:8080'
     environment:
       - DB_HOST=database
+      # - DB_PORT=5440
       - DB_USERNAME=postgres
       - DB_PASSWORD=root
       - DB_DATABASE=postgres
