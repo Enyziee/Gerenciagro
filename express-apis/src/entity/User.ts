@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Farm } from './Farm';
 
-@Entity()
+@Entity({ name: 'Users' })
 export class User {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
@@ -31,7 +31,7 @@ export class User {
 	address!: string;
 
 	@CreateDateColumn()
-	creationDate!: string;
+	createdAt!: string;
 
 	@OneToMany(() => Farm, (farm) => farm.user)
 	farms!: Farm[];

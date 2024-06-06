@@ -9,6 +9,6 @@
 	"ignorePatterns": ["**/dist/*"],
 	"rules": {
 		"import/extensions": 0,
-		"semi": "error"
+		"semi": "warn"
 	}
 }

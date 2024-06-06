@@ -1,10 +1,15 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Farm } from './Farm';
+import { ClimateHistory } from './ClimateHistory';
+import { DefensiveHistory } from './DefensiveHistory';
 
-@Entity()
+@Entity({ name: 'Fields' })
 export class Field {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
+
+	@CreateDateColumn()
+	createdAt!: number;
 
 	@Column({
 		type: 'varchar',
@@ -17,6 +22,15 @@ export class Field {
 	})
 	size!: number;
 
-	@ManyToOne(() => Farm, (farm) => farm.field)
+	@Column()
+	farmId!: string;
+
+	@ManyToOne(() => Farm, (farm) => farm.fields)
 	farm!: Farm;
+
+	@OneToMany(() => ClimateHistory, (climateHistory) => climateHistory.field)
+	climateHistory!: ClimateHistory[];
+
+	@OneToMany(() => DefensiveHistory, (defensiveHistory) => defensiveHistory.field)
+	defensiveHistory!: DefensiveHistory[];
 }

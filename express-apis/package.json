@@ -6,10 +6,10 @@
 	"scripts": {
 		"build": "npx tsc",
 		"dev": "npx tsc && node --require dotenv/config ./dist/app.js",
-		"typeorm:generate": "npx typeorm-ts-node-commonjs migration:generate src/db/migrations/migration -d src/db/DataSource.ts",
-		"typeorm:migrate": "npx typeorm-ts-node-commonjs migration:run -d src/db/DataSource.ts",
-		"typeorm:revert": "npx typeorm-ts-node-commonjs migration:revert -d src/db/DataSource.ts",
-		"typeorm:drop": "npx typeorm-ts-node-commonjs schema:drop -d src/db/DataSource.ts"
+		"typeorm:generate": "npx tsc && npx typeorm-ts-node-commonjs migration:generate src/db/migrations/migration -d src/db/DataSource.ts",
+		"typeorm:migrate": "npx tsc && npx typeorm-ts-node-commonjs migration:run -d src/db/DataSource.ts",
+		"typeorm:revert": "npx tsc && npx typeorm-ts-node-commonjs migration:revert -d src/db/DataSource.ts",
+		"typeorm:drop": "npx tsc && npx typeorm-ts-node-commonjs schema:drop -d src/db/DataSource.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -41,6 +41,7 @@
 		"express-validator": "^7.1.0",
 		"jsonwebtoken": "^9.0.2",
 		"morgan": "^1.10.0",
+		"openmeteo": "^1.1.4",
 		"pg": "^8.11.3",
 		"reflect-metadata": "^0.2.2",
 		"typeorm": "^0.3.20",

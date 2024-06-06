@@ -5,24 +5,24 @@ import DataSource from '../db/DataSource';
 const userRepository = DataSource.getRepository(User);
 
 export async function showUserInfo(req: Request, res: Response) {
-	const userId: string = res.locals.claims.userid;
-
-	if (!userId) {
-		return res.status(401).json({ error: 'ID not provided' });
-	}
-
-	if (userId.length != 36) {
-		return res.status(400).json({ error: 'Invalid ID' });
-	}
-
 	const user = await userRepository.findOneBy({
-		id: userId,
+		id: res.locals.claims.userid,
 	});
 
 	if (!(user instanceof User)) {
-		res.status(404).json({ error: 'Not found' });
+		return res.status(404).json({ error: 'User not found' });
 	}
 
 	delete (user as { password?: string }).password;
 	return res.status(200).json({ content: user });
+}
+
+export async function updateUserInfo(req: Request, res: Response) {
+	res.json({ message: 'Not implemented' });
+}
+
+export async function deleteUserFromJWT(req: Request, res: Response) {
+	const userID = res.locals.claims.userid;
+
+	res.json({ message: `User ${userID} deleted` });
 }

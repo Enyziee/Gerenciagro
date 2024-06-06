@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'ty
 import { User } from './User';
 import { Field } from './Field';
 
-@Entity()
+@Entity({ name: 'Farms' })
 export class Farm {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
@@ -19,9 +19,17 @@ export class Farm {
 	})
 	address!: string;
 
+	@Column({
+		nullable: true,
+	})
+	numberOfFields!: number;
+
+	@Column()
+	userId!: string;
+
 	@ManyToOne(() => User, (user) => user.farms)
 	user!: User;
 
 	@OneToMany(() => Field, (field) => field.farm)
-	field!: Field[];
+	fields!: Field[];
 }
