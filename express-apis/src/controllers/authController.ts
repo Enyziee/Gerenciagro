@@ -60,7 +60,7 @@ export async function register(req: Request, res: Response) {
 		const userSaved = await userRepository.save(user);
 		const token = await createJWT(userSaved);
 
-		return res.status(201).json({ acess_token: token, refresh_token: 'albiononline' });
+		return res.status(201).json({ access_token: token, refresh_token: 'refresh_token' });
 	} catch (error) {
 		console.error(error);
 		return res.status(500).json({ error: 'Internal Error' });

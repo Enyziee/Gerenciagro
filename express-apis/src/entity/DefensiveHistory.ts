@@ -7,7 +7,7 @@ export class DefensiveHistory {
 	id!: string;
 
 	@CreateDateColumn()
-	createdAt!: string;
+	createdAt!: number;
 
 	@Column()
 	agrodefensive!: string;

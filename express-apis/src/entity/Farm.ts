@@ -1,4 +1,12 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	ManyToOne,
+	OneToMany,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
+} from 'typeorm';
 import { User } from './User';
 import { Field } from './Field';
 
@@ -23,6 +31,12 @@ export class Farm {
 		nullable: true,
 	})
 	numberOfFields!: number;
+
+	@CreateDateColumn()
+	createdAt!: number;
+
+	@UpdateDateColumn()
+	updatedAt!: number;
 
 	@Column()
 	userId!: string;

@@ -46,16 +46,3 @@ export async function showAllFarms(req: Request, res: Response) {
 
 	res.status(200).json({ data: farms });
 }
-
-export async function climateData(req: Request, res: Response) {
-	const fieldID = req.params['fieldid'];
-
-	// const field = await fieldRepository.findBy({
-	// 	id: fieldID,
-	// 	farm: {
-	// 		user: res.locals.claims.userid,
-	// 	},
-	// });
-
-	res.status(200).json({ data: fieldID });
-}

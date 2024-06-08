@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { checkJWT } from '../middleware/authentication';
+import { checkJWT } from '../middleware/middlewares';
 import { createNewFarm, showAllFarms, showFarm } from '../controllers/farmController';
 import { body, param } from 'express-validator';
 import { validationErrorHandler } from '../modules/validations';
-import { createNewField, getAllFieldsFromFarm, getField } from '../controllers/fieldController';
+import { climateData, createNewField, getAllFieldsFromFarm, getField } from '../controllers/fieldController';
 
 export default (router: Router) => {
 	// Only farms endpoints
@@ -45,5 +45,15 @@ export default (router: Router) => {
 		validationErrorHandler,
 		checkJWT,
 		getField,
+	);
+
+	router.post(
+		'/farms/:farmid/fields/:fieldid/fetchclimate',
+		param('farmid').isUUID(),
+		param('fieldid').isUUID(),
+		body('days').isNumeric(),
+		validationErrorHandler,
+		checkJWT,
+		climateData,
 	);
 };

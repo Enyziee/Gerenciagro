@@ -1,4 +1,12 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	ManyToOne,
+	OneToMany,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
+} from 'typeorm';
 import { Farm } from './Farm';
 import { ClimateHistory } from './ClimateHistory';
 import { DefensiveHistory } from './DefensiveHistory';
@@ -10,6 +18,14 @@ export class Field {
 
 	@CreateDateColumn()
 	createdAt!: number;
+
+	@UpdateDateColumn()
+	updatedAt!: number;
+
+	@Column({
+		nullable: true,
+	})
+	coordinates?: number;
 
 	@Column({
 		type: 'varchar',
