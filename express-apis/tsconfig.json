@@ -7,9 +7,7 @@
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"esModuleInterop": true,
-		"declaration": true,
 		"sourceMap": true,
-		"allowSyntheticDefaultImports": true,
 		"removeComments": true,
 		"outDir": "./dist"
 	},
