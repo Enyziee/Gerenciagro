@@ -6,7 +6,7 @@ import express, { json, urlencoded } from 'express';
 import DataSource from './db/DataSource';
 import routes from './routes/index';
 
-const PORT = process.env.EXPRESS_PORT ? process.env.EXPRESS_PORT : 8080;
+const PORT = process.env.EXPRESS_PORT ? process.env.EXPRESS_PORT : 3000;
 const app = express();
 
 app.use(morgan('dev'));

@@ -1,0 +1,35 @@
+services:
+  database:
+    image: postgres:16.3
+    environment:
+      - POSTGRES_PASSWORD=root
+    ports:
+      - '5432'
+    restart: unless-stopped
+    
+
+  nodeapi:
+    build:
+      context: ./express-apis
+    depends_on:
+      - database
+    environment:
+      - DB_HOST=database
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=root
+      - DB_DATABASE=postgres
+      - JWT_SECRET=token
+    restart: unless-stopped
+
+    
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - nodeapi
+    environment:
+      - APISERVER_IP=nodeapi
+    restart: unless-stopped

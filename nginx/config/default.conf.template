@@ -1,0 +1,19 @@
+server {    
+    listen 443 ssl;
+
+    server_name gerenciagro.me www.gerenciagro.me;
+
+    ssl_certificate /etc/nginx/certs/ssl_certificate.crt;
+    ssl_certificate_key /etc/nginx/certs/ssl_certificate.key;
+
+    location /api {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_hide_header       X-Powered-By;
+
+        proxy_pass http://${APISERVER_IP}:3000;
+    }
+}
