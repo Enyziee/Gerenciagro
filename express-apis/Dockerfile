@@ -23,4 +23,6 @@ COPY --from=development /usr/src/app/dist ./dist
 
 ENV NODE_ENV=production
 
+EXPOSE 3000
+
 CMD npx typeorm migration:run -d ./dist/db/DataSource.js && node dist/app.js

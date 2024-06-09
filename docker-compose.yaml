@@ -1,16 +1,17 @@
 services:
   database:
     image: postgres:16.3
+    volumes:
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=root
     ports:
-      - '5432'
+      - '5432:5432'
     restart: unless-stopped
-    
 
   nodeapi:
     build:
-      context: ./express-apis
+      context: ./express-apiss
     depends_on:
       - database
     environment:
@@ -21,7 +22,6 @@ services:
       - JWT_SECRET=token
     restart: unless-stopped
 
-    
   nginx:
     build:
       context: ./nginx
