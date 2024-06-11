@@ -10,6 +10,7 @@ import {
 import { Farm } from './Farm';
 import { ClimateHistory } from './ClimateHistory';
 import { DefensiveHistory } from './DefensiveHistory';
+import { Coordinates } from '../modules/types';
 
 @Entity({ name: 'Fields' })
 export class Field {
@@ -17,9 +18,10 @@ export class Field {
 	id!: string;
 
 	@Column({
+		type: 'point',
 		nullable: true,
 	})
-	coordinates?: string;
+	coordinates!: Coordinates;
 
 	@Column({
 		type: 'varchar',
