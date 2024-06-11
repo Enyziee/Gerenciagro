@@ -1,7 +1,6 @@
 import morgan from 'morgan';
 import 'reflect-metadata';
 
-// import { json, urlencoded } from 'body-parser';
 import express, { json, urlencoded } from 'express';
 import DataSource from './db/DataSource';
 import routes from './routes/index';

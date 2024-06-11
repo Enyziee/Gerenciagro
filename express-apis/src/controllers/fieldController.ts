@@ -3,6 +3,7 @@ import DataSource from '../db/DataSource';
 import { Field } from '../entity/Field';
 import { Farm } from '../entity/Farm';
 import { fetchWeatherApi } from 'openmeteo';
+import { Coordinates } from '../modules/types';
 
 const fieldRepository = DataSource.getRepository(Field);
 const farmRepository = DataSource.getRepository(Farm);
@@ -20,13 +21,30 @@ export async function createNewField(req: Request, res: Response) {
 		return res.status(404).json({ errors: 'Farm not found' });
 	}
 
+	const coords: string = req.body.coordinates;
+
+	const regex = /LatLng\(lat: ([-+]?[0-9]+\.[0-9]*), lng: ([-+]?[0-9]+\.[0-9]*)\)/;
+	const coordsMatch = regex.exec(coords);
+
+	if (!coordsMatch) {
+		return res.status(400).json({ errors: 'Invalid coordinates format' });
+	}
+
 	const field = fieldRepository.create();
 	field.name = req.body.name;
 	field.size = req.body.size;
-	field.coordinates = req.body.coordinates;
+	field.coordinates.x = coordsMatch[1];
+	field.coordinates.y = coordsMatch[2];
 	field.farm = farm;
 
-	await fieldRepository.save(field);
+	try {
+		await fieldRepository.save(field);
+		farm.numberOfFields++;
+		await farmRepository.save(farm);
+	} catch (err) {
+		console.error("Error when saving a new field or updating farm", err);
+		return res.status(500).json({ errors: 'Internal Error' });
+	}
 
 	res.status(201).json({ message: 'Field created with success', data: { field_id: field.id } });
 }
@@ -45,6 +63,13 @@ export async function getAllFieldsFromFarm(req: Request, res: Response) {
 
 	const fields = await fieldRepository.findBy({
 		farmId: farmID,
+	});
+
+	fields.forEach((field) => {
+		delete (field as { createdAt?: number }).createdAt;
+		delete (field as { updatedAt?: number }).updatedAt;
+		delete (field as { coordinates?: Coordinates }).coordinates;
+		delete (field as { farmId?: string }).farmId;
 	});
 
 	res.status(200).json({ data: fields });
@@ -99,8 +124,8 @@ export async function climateData(req: Request, res: Response) {
 	const startDate = myDate.toISOString().slice(0, 10);
 
 	const params = {
-		latitude: -19.3086,
-		longitude: -47.5253,
+		latitude: field.coordinates.x,
+		longitude: field.coordinates.y,
 		start_date: '2024-06-01',
 		end_date: '2024-06-07',
 		daily: ['temperature_2m_mean', 'precipitation_sum'],

@@ -2,11 +2,9 @@ import { Request, Response } from 'express';
 import DataSource from '../db/DataSource';
 import { Farm } from '../entity/Farm';
 import { User } from '../entity/User';
-import { Field } from '../entity/Field';
 
 const farmRepository = DataSource.getRepository(Farm);
 const userRepository = DataSource.getRepository(User);
-const fieldRepository = DataSource.getRepository(Field);
 
 export async function createNewFarm(req: Request, res: Response) {
 	const userID = res.locals.claims.userid;
@@ -42,6 +40,12 @@ export async function showAllFarms(req: Request, res: Response) {
 		user: {
 			id: res.locals.claims.userid,
 		},
+	});
+
+	farms.forEach((farm) => {
+		delete (farm as { createdAt?: number }).createdAt;
+		delete (farm as { updatedAt?: number }).updatedAt;
+		delete (farm as { userId?: string }).userId;
 	});
 
 	res.status(200).json({ data: farms });
