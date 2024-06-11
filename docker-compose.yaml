@@ -11,7 +11,7 @@ services:
 
   nodeapi:
     build:
-      context: ./express-apiss
+      context: ./express-apis
     depends_on:
       - database
     environment:

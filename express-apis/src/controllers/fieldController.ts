@@ -66,7 +66,7 @@ export async function getField(req: Request, res: Response) {
 
 	const field = await fieldRepository.findOneBy({
 		id: fieldID,
-		farm: farm,
+		farmId: farmID,
 	});
 
 	return res.status(200).json({ data: field });

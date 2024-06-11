@@ -11,32 +11,10 @@ export default (router: Router) => {
 	// Return all farms from a authenticated user
 	router.get('/farms', checkJWT, showAllFarms);
 
-	// Create a new farm for the authenticated user
-	router.post(
-		'/farms',
-		body('name').isString(),
-		body('address').isString(),
-		validationErrorHandler,
-		checkJWT,
-		createNewFarm,
-	);
-
 	// Return only the farm that matchs the ID passed by route paramater
 	router.get('/farms/:farmid', param('farmid').isUUID(), validationErrorHandler, checkJWT, showFarm);
 
 	router.get('/farms/:farmid/fields', param('farmid').isUUID(), validationErrorHandler, checkJWT, getAllFieldsFromFarm);
-
-	// Create a new field inside a farm from farmid route parameter
-	router.post(
-		'/farms/:farmid/fields',
-		param('farmid').isUUID(),
-		body('name').isString(),
-		body('size').isNumeric(),
-		body('coordinates').isString(),
-		validationErrorHandler,
-		checkJWT,
-		createNewField,
-	);
 
 	router.get(
 		'/farms/:farmid/fields/:fieldid',
@@ -45,6 +23,28 @@ export default (router: Router) => {
 		validationErrorHandler,
 		checkJWT,
 		getField,
+	);
+
+	// Create a new farm for the authenticated user
+	router.post(
+		'/farms',
+		body('name').exists().isString(),
+		body('address').exists().isString(),
+		validationErrorHandler,
+		checkJWT,
+		createNewFarm,
+	);
+
+	// Create a new field inside a farm from farmid route parameter
+	router.post(
+		'/farms/:farmid/fields',
+		param('farmid').exists().isUUID(),
+		body('name').exists().isString(),
+		body('size').exists().isNumeric(),
+		body('coordinates').exists().isString(),
+		validationErrorHandler,
+		checkJWT,
+		createNewField,
 	);
 
 	router.post(

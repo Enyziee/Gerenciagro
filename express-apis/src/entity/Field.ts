@@ -16,16 +16,10 @@ export class Field {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
 
-	@CreateDateColumn()
-	createdAt!: number;
-
-	@UpdateDateColumn()
-	updatedAt!: number;
-
 	@Column({
 		nullable: true,
 	})
-	coordinates?: number;
+	coordinates?: string;
 
 	@Column({
 		type: 'varchar',
@@ -40,6 +34,12 @@ export class Field {
 
 	@Column()
 	farmId!: string;
+
+	@CreateDateColumn()
+	createdAt!: number;
+
+	@UpdateDateColumn()
+	updatedAt!: number;
 
 	@ManyToOne(() => Farm, (farm) => farm.fields)
 	farm!: Farm;
