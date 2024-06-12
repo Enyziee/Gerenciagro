@@ -3,7 +3,6 @@ import DataSource from '../db/DataSource';
 import { Field } from '../entity/Field';
 import { Farm } from '../entity/Farm';
 import { fetchWeatherApi } from 'openmeteo';
-import { Coordinates } from '../modules/types';
 
 const fieldRepository = DataSource.getRepository(Field);
 const farmRepository = DataSource.getRepository(Farm);
@@ -33,8 +32,8 @@ export async function createNewField(req: Request, res: Response) {
 	const field = fieldRepository.create();
 	field.name = req.body.name;
 	field.size = req.body.size;
-	field.coordinates.x = coordsMatch[1];
-	field.coordinates.y = coordsMatch[2];
+	field.latitude = coordsMatch[1];
+	field.longitude = coordsMatch[2];
 	field.farm = farm;
 
 	try {
@@ -68,7 +67,8 @@ export async function getAllFieldsFromFarm(req: Request, res: Response) {
 	fields.forEach((field) => {
 		delete (field as { createdAt?: number }).createdAt;
 		delete (field as { updatedAt?: number }).updatedAt;
-		delete (field as { coordinates?: Coordinates }).coordinates;
+		delete (field as { latitude?: string }).latitude;
+		delete (field as { longitude?: string }).longitude;
 		delete (field as { farmId?: string }).farmId;
 	});
 
@@ -124,8 +124,6 @@ export async function climateData(req: Request, res: Response) {
 	const startDate = myDate.toISOString().slice(0, 10);
 
 	const params = {
-		latitude: field.coordinates.x,
-		longitude: field.coordinates.y,
 		start_date: '2024-06-01',
 		end_date: '2024-06-07',
 		daily: ['temperature_2m_mean', 'precipitation_sum'],

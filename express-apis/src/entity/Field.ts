@@ -10,19 +10,12 @@ import {
 import { Farm } from './Farm';
 import { ClimateHistory } from './ClimateHistory';
 import { DefensiveHistory } from './DefensiveHistory';
-import { Coordinates } from '../modules/types';
 
 @Entity({ name: 'Fields' })
 export class Field {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
-
-	@Column({
-		type: 'point',
-		nullable: true,
-	})
-	coordinates!: Coordinates;
-
+	
 	@Column({
 		type: 'varchar',
 		length: 32,
@@ -34,6 +27,16 @@ export class Field {
 	})
 	size!: number;
 
+	@Column({
+		nullable: true,
+	})
+	latitude!: string;
+	
+	@Column({
+		nullable: true,
+	})
+	longitude!: string;
+	
 	@Column()
 	farmId!: string;
 

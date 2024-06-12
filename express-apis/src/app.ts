@@ -1,20 +1,13 @@
-import morgan from 'morgan';
 import 'reflect-metadata';
 
-import express, { json, urlencoded } from 'express';
 import DataSource from './db/DataSource';
-import routes from './routes/index';
+import { createServer } from './modules/utils';
 
 const PORT = process.env.EXPRESS_PORT ? process.env.EXPRESS_PORT : 3000;
-const app = express();
-
-app.use(morgan('dev'));
-app.use(json());
-app.use(urlencoded({ extended: true }));
-app.use('/api', routes());
+const app = createServer();
 
 DataSource.initialize()
-	.then(async () => {
+	.then(() => {
 		app.listen(PORT, async () => {
 			console.log(`Server listening on http://localhost:${PORT}`);
 		});
