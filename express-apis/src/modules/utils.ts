@@ -1,7 +1,8 @@
-import express, { json, urlencoded, type Express } from 'express';
+import express, { json, Response, urlencoded, type Express } from 'express';
 import morgan from 'morgan';
 import routes from '../routes';
 import { fetchWeatherApi } from 'openmeteo';
+import { Farm } from '../entity/Farm';
 
 type weatherRecord = {
 	timestamp: string;
@@ -47,10 +48,12 @@ export async function fetchWeatherData(latitude: string, longitude: string, days
 	let weatherRecords: weatherRecord[] = [];
 
 	for (let i = 0; i < weatherData.daily.time.length; i++) {
-		weatherRecords.push({
-			timestamp: weatherData.daily.time[i].toISOString(),
-			precipitation: weatherData.daily.precipitationSum[i],
-		});
+		if (!isNaN(weatherData.daily.precipitationSum[i])) {
+			weatherRecords.push({
+				timestamp: weatherData.daily.time[i].toISOString(),
+				precipitation: weatherData.daily.precipitationSum[i],
+			});
+		}
 	}
 
 	return weatherRecords;
