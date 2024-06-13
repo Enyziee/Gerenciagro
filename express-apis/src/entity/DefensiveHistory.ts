@@ -11,6 +11,11 @@ export class DefensiveHistory {
 
 	@Column()
 	agrodefensive!: string;
+	
+	@Column({
+		type: 'numeric'
+	})
+	volume!: number;
 
 	@ManyToOne(() => Field, (field) => field.climateHistory)
 	field!: Field;
