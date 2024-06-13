@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Farm } from './Farm';
+import { RefreshToken } from './refreshToken';
 
 @Entity({ name: 'Users' })
 export class User {
@@ -38,4 +39,7 @@ export class User {
 
 	@OneToMany(() => Farm, (farm) => farm.user, { cascade: true })
 	farms!: Farm[];
+
+	@OneToMany(() => RefreshToken, (token) => token.user)
+	refreshTokens!: RefreshToken[];
 }

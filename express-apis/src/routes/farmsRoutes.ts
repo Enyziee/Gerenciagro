@@ -5,6 +5,7 @@ import { body, param, query } from 'express-validator';
 import { validationErrorHandler } from '../modules/validations';
 import {
 	createNewField,
+	getAllDefensivesRecords,
 	getAllFieldsFromFarm,
 	getAllWeatherData,
 	getField,
@@ -72,5 +73,14 @@ export default (router: Router) => {
 		validationErrorHandler,
 		checkJWT,
 		saveDefensiveRecord,
+	);
+
+	router.get(
+		'/farms/:farmid/fields/:fieldid/agrodefensives',
+		param('farmid').isUUID(),
+		param('fieldid').isUUID(),
+		validationErrorHandler,
+		checkJWT,
+		getAllDefensivesRecords,
 	);
 };

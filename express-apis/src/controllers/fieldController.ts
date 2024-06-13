@@ -205,4 +205,8 @@ export async function getAllDefensivesRecords(req: Request, res: Response) {
 	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
 		return res.status(404).json({ error: 'Resource not found' });
 	}
+
+	const defensives = farmWithField[0].fields[0].defensiveHistory;
+
+	res.status(200).json({ data: defensives });
 }
