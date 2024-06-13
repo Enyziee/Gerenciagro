@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { checkJWT } from '../middleware/middlewares';
 import { createNewFarm, showAllFarms, showFarm } from '../controllers/farmController';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import { validationErrorHandler } from '../modules/validations';
 import {
 	createNewField,
@@ -57,7 +57,7 @@ export default (router: Router) => {
 		'/farms/:farmid/fields/:fieldid/weather',
 		param('farmid').isUUID(),
 		param('fieldid').isUUID(),
-		body('days').isNumeric(),
+		query('days').optional().isNumeric(),
 		validationErrorHandler,
 		checkJWT,
 		getAllWheaterData,

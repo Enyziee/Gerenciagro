@@ -96,32 +96,23 @@ export async function getField(req: Request, res: Response) {
 		},
 	});
 
-	const farm = await farmRepository.findOneBy({
-		id: farmID,
-		userId: userID,
-	});
-
-	if (!farm) {
+	if (!farmWithField[0]) {
 		return res.status(404).json({ errors: 'Farm not found' });
 	}
 
-	const field = await fieldRepository.findOneBy({
-		id: fieldID,
-		farmId: farmID,
-	});
-
-	if (!field) {
+	if (!!farmWithField[0].fields[0]) {
 		return res.status(404).json({ errors: 'Field not found' });
 	}
 
-	return res.status(200).json({ data: field });
+	return res.status(200).json({ data: farmWithField[0].fields[0] });
 }
 
 export async function getAllWheaterData(req: Request, res: Response) {
 	const userID = res.locals.claims.userid;
 	const farmID = req.params.farmid;
 	const fieldID = req.params.fieldid;
-	const days = req.body.days;
+
+	const days = parseInt(req.query.days!.toString());
 
 	const farm = await farmRepository.findOneBy({
 		id: farmID,
