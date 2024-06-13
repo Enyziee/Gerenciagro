@@ -6,7 +6,7 @@ import { validationErrorHandler } from '../modules/validations';
 import {
 	createNewField,
 	getAllFieldsFromFarm,
-	getAllWheaterData,
+	getAllWeatherData,
 	getField,
 	saveDefensiveRecord,
 } from '../controllers/fieldController';
@@ -60,7 +60,7 @@ export default (router: Router) => {
 		query('days').optional().isNumeric(),
 		validationErrorHandler,
 		checkJWT,
-		getAllWheaterData,
+		getAllWeatherData,
 	);
 
 	router.post(

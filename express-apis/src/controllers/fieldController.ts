@@ -54,17 +54,22 @@ export async function getAllFieldsFromFarm(req: Request, res: Response) {
 	const userID = res.locals.claims.userid;
 	const farmID = req.params.farmid;
 
-	const farm = await farmRepository.findOneBy({
-		id: farmID,
+	const farmWithField = await farmRepository.find({
+		where: {
+			id: farmID,
+			userId: userID,
+		},
+
+		relations: {
+			fields: true,
+		},
 	});
 
-	if (!farm || farm.userId != userID) {
-		return res.status(404).json({ errors: 'Farm not found' });
+	if (!farmWithField[0]) {
+		return res.status(404).json({ error: 'Resource not found' });
 	}
 
-	const fields = await fieldRepository.findBy({
-		farmId: farmID,
-	});
+	const fields = farmWithField[0].fields;
 
 	fields.forEach((field) => {
 		delete (field as { createdAt?: number }).createdAt;
@@ -96,45 +101,51 @@ export async function getField(req: Request, res: Response) {
 		},
 	});
 
-	if (!farmWithField[0]) {
-		return res.status(404).json({ errors: 'Farm not found' });
-	}
-
-	if (!!farmWithField[0].fields[0]) {
-		return res.status(404).json({ errors: 'Field not found' });
+	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
+		return res.status(404).json({ error: 'Resource not found' });
 	}
 
 	return res.status(200).json({ data: farmWithField[0].fields[0] });
 }
 
-export async function getAllWheaterData(req: Request, res: Response) {
+export async function getAllWeatherData(req: Request, res: Response) {
 	const userID = res.locals.claims.userid;
 	const farmID = req.params.farmid;
 	const fieldID = req.params.fieldid;
 
 	const days = parseInt(req.query.days!.toString());
 
-	const farm = await farmRepository.findOneBy({
-		id: farmID,
-		userId: userID,
-	});
-
-	if (!farm) {
-		return res.status(404).json({ errors: 'Farm not found' });
+	if (days < 1 || days > 365) {
+		return res.status(400).json({ errors: 'Value out of range' });
 	}
 
-	const field = await fieldRepository.findOneBy({
-		id: fieldID,
-		farmId: farmID,
+	const farmWithField = await farmRepository.find({
+		where: {
+			id: farmID,
+			userId: userID,
+			fields: {
+				id: fieldID,
+			},
+		},
+
+		relations: {
+			fields: true,
+		},
 	});
 
-	if (!field) {
-		return res.status(404).json({ errors: 'Field not found' });
+	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
+		return res.status(404).json({ error: 'Resource not found' });
 	}
 
-	const weatherData = await fetchWeatherData(field.latitude, field.longitude, days);
+	const field = farmWithField[0].fields[0];
 
-	res.status(200).json({ count: weatherData.length, data: weatherData });
+	try {
+		const weatherData = await fetchWeatherData(field.latitude, field.longitude, days);
+		res.status(200).json({ count: weatherData.length, data: weatherData });
+	} catch (err) {
+		console.error('Problem fetching weather data from OpenMeteo\n', err);
+		res.status(500).json({ error: err });
+	}
 }
 
 export async function saveDefensiveRecord(req: Request, res: Response) {
@@ -142,23 +153,25 @@ export async function saveDefensiveRecord(req: Request, res: Response) {
 	const farmID = req.params.farmid;
 	const fieldID = req.params.fieldid;
 
-	const farm = await farmRepository.findOneBy({
-		id: farmID,
-		userId: userID,
+	const farmWithField = await farmRepository.find({
+		where: {
+			id: farmID,
+			userId: userID,
+			fields: {
+				id: fieldID,
+			},
+		},
+
+		relations: {
+			fields: true,
+		},
 	});
 
-	if (!farm) {
-		return res.status(404).json({ errors: 'Farm not found' });
+	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
+		return res.status(404).json({ error: 'Resource not found' });
 	}
 
-	const field = await fieldRepository.findOneBy({
-		id: fieldID,
-		farmId: farmID,
-	});
-
-	if (!field) {
-		return res.status(404).json({ errors: 'Field not found' });
-	}
+	const field = farmWithField[0].fields[0];
 
 	const defensiveRecord = defensiveRepository.create();
 	defensiveRecord.agrodefensive = req.body.name;
@@ -170,4 +183,26 @@ export async function saveDefensiveRecord(req: Request, res: Response) {
 	res.status(201).json({ message: 'Agrodefensive record saved with success' });
 }
 
-export async function getAllDefensivesRecords(req: Request, res: Response) {}
+export async function getAllDefensivesRecords(req: Request, res: Response) {
+	const userID = res.locals.claims.userid;
+	const farmID = req.params.farmid;
+	const fieldID = req.params.fieldid;
+
+	const farmWithField = await farmRepository.find({
+		where: {
+			id: farmID,
+			userId: userID,
+			fields: {
+				id: fieldID,
+			},
+		},
+
+		relations: {
+			fields: { defensiveHistory: true },
+		},
+	});
+
+	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
+		return res.status(404).json({ error: 'Resource not found' });
+	}
+}
