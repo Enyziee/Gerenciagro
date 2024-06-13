@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { login, register } from '../controllers/authController';
-import { body } from 'express-validator';
+import { login, refreshJWT, register } from '../controllers/authController';
+import { body, header } from 'express-validator';
 import { validationErrorHandler } from '../modules/validations';
 
 export default (router: Router) => {
@@ -15,6 +15,11 @@ export default (router: Router) => {
 		validationErrorHandler,
 		register,
 	);
-	
-	// router.post('/auth/refresh', refreshToken);
+
+	router.post(
+		'/auth/refresh',
+		body('refresh_token').notEmpty().isHexadecimal().isLength({ min: 32, max: 32 }),
+		validationErrorHandler,
+		refreshJWT,
+	);
 };

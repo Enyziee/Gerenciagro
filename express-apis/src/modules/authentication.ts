@@ -11,9 +11,9 @@ export async function validadeJWT(token: string) {
 }
 
 export function createRefreshToken() {
-	const token = randomBytes(16).toString('base64');
+	const token = randomBytes(16).toString('hex');
 	const issuedAt = Date.now();
-	const expiresIn = Date.now() + Date.now() + 86.400;
-	
-	return {token, issuedAt, expiresIn};
+	const expiresAt = Date.now() + Date.now() + 86400;
+
+	return { token, issuedAt, expiresAt };
 }

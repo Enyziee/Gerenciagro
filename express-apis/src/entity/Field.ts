@@ -7,8 +7,8 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
-import { Farm } from './Farm';
 import { DefensiveHistory } from './DefensiveHistory';
+import { Farm } from './Farm';
 
 @Entity({ name: 'Fields' })
 export class Field {

@@ -3,10 +3,13 @@ import DataSource from '../db/DataSource';
 
 import { Request, Response } from 'express';
 
-import { createJWT, createRefreshToken, validadeJWT } from '../modules/authentication';
+import { JwtPayload } from 'jsonwebtoken';
+import { RefreshToken } from '../entity/refreshToken';
 import { User } from '../entity/User';
+import { createJWT, createRefreshToken, validadeJWT } from '../modules/authentication';
 
 const userRepository = DataSource.getRepository(User);
+const refreshTokenRepo = DataSource.getRepository(RefreshToken);
 
 export async function login(req: Request, res: Response) {
 	try {
@@ -24,11 +27,21 @@ export async function login(req: Request, res: Response) {
 			return res.status(401).json({ errors: 'Invalid Credentials' });
 		}
 
-		const token = await createJWT(user);
+		const accessToken = await createJWT(user);
+		const accessTokenData = (await validadeJWT(accessToken)) as JwtPayload;
 		const refreshData = createRefreshToken();
-		
 
-		return res.status(200).json({ access_token: token });
+		const refreshTokenEntity = refreshTokenRepo.create();
+		refreshTokenEntity.token = refreshData.token;
+		refreshTokenEntity.issuedAt = new Date(refreshData.issuedAt);
+		refreshTokenEntity.expiresAt = new Date(refreshData.expiresAt);
+		refreshTokenEntity.user = user;
+		refreshTokenRepo.save;
+
+		return res.status(200).json({
+			access_token: { token: accessToken, expireAt: accessTokenData.exp },
+			refresh_token: { token: refreshData.token, expireAt: refreshData.expiresAt },
+		});
 	} catch (error) {
 		console.error('Something go wrong\n', error);
 		return res.status(500).json({ errors: 'Internal Error' });
@@ -69,6 +82,26 @@ export async function register(req: Request, res: Response) {
 	}
 }
 
-// export async function refreshToken(req: Request, res: Response) {
-// 	// const jwt = validadeJWT();
-// }
+export async function refreshJWT(req: Request, res: Response) {
+	const authHeader = req.headers.authorization;
+
+	const bearer = req.headers.authorization;
+
+	if (!bearer) {
+		res.status(401);
+		res.json({ message: 'Authorization Header not provided' });
+		return;
+	}
+
+	const [, token] = bearer.split(' ');
+
+	if (!token) {
+		res.status(401);
+		res.json({ message: 'Access token not provided' });
+		return;
+	}
+	
+	const tokenPayload = validadeJWT(token);
+
+	res.send(200);
+}
