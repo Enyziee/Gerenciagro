@@ -3,9 +3,14 @@ import DataSource from '../db/DataSource';
 import { Field } from '../entity/Field';
 import { Farm } from '../entity/Farm';
 import { fetchWeatherApi } from 'openmeteo';
+import { ClimateHistory } from '../entity/ClimateHistory';
+import { RecordExists } from 'pg-mem';
+import { DefensiveHistory } from '../entity/DefensiveHistory';
 
 const fieldRepository = DataSource.getRepository(Field);
 const farmRepository = DataSource.getRepository(Farm);
+const climateRepo = DataSource.getRepository(ClimateHistory);
+const defensiveRepository = DataSource.getRepository(DefensiveHistory);
 
 export async function createNewField(req: Request, res: Response) {
 	const userID = res.locals.claims.userid;
@@ -41,7 +46,7 @@ export async function createNewField(req: Request, res: Response) {
 		farm.numberOfFields++;
 		await farmRepository.save(farm);
 	} catch (err) {
-		console.error("Error when saving a new field or updating farm", err);
+		console.error('Error when saving a new field or updating farm', err);
 		return res.status(500).json({ errors: 'Internal Error' });
 	}
 
@@ -86,14 +91,18 @@ export async function getField(req: Request, res: Response) {
 	});
 
 	if (!farm) {
-		return res.status(404).json({ errors: 'Field not found' });
+		return res.status(404).json({ errors: 'Farm not found' });
 	}
 
 	const field = await fieldRepository.findOneBy({
 		id: fieldID,
 		farmId: farmID,
 	});
-
+	
+	if (!field) {
+		return res.status(404).json({ errors: 'Field not found' });
+	}
+	
 	return res.status(200).json({ data: field });
 }
 
@@ -124,8 +133,10 @@ export async function climateData(req: Request, res: Response) {
 	const startDate = myDate.toISOString().slice(0, 10);
 
 	const params = {
-		start_date: '2024-06-01',
-		end_date: '2024-06-07',
+		latitude: field.latitude,
+		longitude: field.longitude,
+		start_date: startDate,
+		end_date: currentDate,
 		daily: ['temperature_2m_mean', 'precipitation_sum'],
 		timezone: 'America/Sao_Paulo',
 	};
@@ -168,5 +179,62 @@ export async function climateData(req: Request, res: Response) {
 		);
 	}
 
+	const climateRecords = [];
+
+	for (let i = 0; i < weatherData.daily.time.length; i++) {
+		const record = climateRepo.create();
+
+		if (isNaN(weatherData.daily.precipitationSum[i])) {
+			continue;
+		}
+
+		record.precipitationSum = weatherData.daily.precipitationSum[i];
+		record.timestamp = weatherData.daily.time[i];
+
+		record.field = field;
+
+		climateRecords.push(record);
+	}
+	
+	DataSource.getRepository(ClimateHistory).insert(climateRecords);
+
 	res.status(200).json({ data: weatherData });
 }
+
+export async function getAllClimateRecords(req: Request, res: Response) {}
+
+export async function saveDefensiveRecord(req: Request, res: Response) {
+	const userID = res.locals.claims.userid;
+	const farmID = req.params.farmid;
+	const fieldID = req.params.fieldid;
+	
+	const farm = await farmRepository.findOneBy({
+		id: farmID,
+		userId: userID,
+	});
+
+	if (!farm) {
+		return res.status(404).json({ errors: 'Farm not found' });
+	}
+
+	const field = await fieldRepository.findOneBy({
+		id: fieldID,
+		farmId: farmID,
+	});
+	
+	if (!field) {
+		return res.status(404).json({ errors: 'Field not found' });
+	}
+	
+	
+	const defensiveRecord = defensiveRepository.create();
+	defensiveRecord.agrodefensive = req.body.name;
+	defensiveRecord.volume = req.body.volume;
+	defensiveRecord.field = field;
+	
+	await defensiveRepository.save(defensiveRecord);
+	
+	res.status(201).json({message: 'Agrodefensive record saved with success'});
+}
+
+export async function getAllDefensivesRecords(req: Request, res: Response) {}

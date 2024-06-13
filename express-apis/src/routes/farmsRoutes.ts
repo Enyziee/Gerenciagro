@@ -3,7 +3,7 @@ import { checkJWT } from '../middleware/middlewares';
 import { createNewFarm, showAllFarms, showFarm } from '../controllers/farmController';
 import { body, param } from 'express-validator';
 import { validationErrorHandler } from '../modules/validations';
-import { climateData, createNewField, getAllFieldsFromFarm, getField } from '../controllers/fieldController';
+import { climateData, createNewField, getAllFieldsFromFarm, getField, saveDefensiveRecord } from '../controllers/fieldController';
 
 export default (router: Router) => {
 	// Only farms endpoints
@@ -55,5 +55,16 @@ export default (router: Router) => {
 		validationErrorHandler,
 		checkJWT,
 		climateData,
+	);
+	
+	router.post(
+		'/farms/:farmid/fields/:fieldid/agrodefensives',
+		param('farmid').isUUID(),
+		param('fieldid').isUUID(),
+		body('name').exists().isString(),
+		body('volume').exists().isNumeric(),
+		validationErrorHandler,
+		checkJWT,
+		saveDefensiveRecord
 	);
 };
