@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, refreshToken, register } from '../controllers/authController';
+import { login, register } from '../controllers/authController';
 import { body } from 'express-validator';
 import { validationErrorHandler } from '../modules/validations';
 
@@ -16,5 +16,5 @@ export default (router: Router) => {
 		register,
 	);
 	
-	router.post('/auth/refresh', refreshToken);
+	// router.post('/auth/refresh', refreshToken);
 };

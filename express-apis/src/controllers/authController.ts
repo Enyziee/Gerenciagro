@@ -3,7 +3,7 @@ import DataSource from '../db/DataSource';
 
 import { Request, Response } from 'express';
 
-import { createJWT } from '../modules/authentication';
+import { createJWT, validadeJWT } from '../modules/authentication';
 import { User } from '../entity/User';
 
 const userRepository = DataSource.getRepository(User);
@@ -66,3 +66,7 @@ export async function register(req: Request, res: Response) {
 		return res.status(500).json({ error: 'Internal Error' });
 	}
 }
+
+// export async function refreshToken(req: Request, res: Response) {
+// 	// const jwt = validadeJWT();
+// }

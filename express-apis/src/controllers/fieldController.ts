@@ -4,7 +4,6 @@ import { Field } from '../entity/Field';
 import { Farm } from '../entity/Farm';
 import { fetchWeatherApi } from 'openmeteo';
 import { ClimateHistory } from '../entity/ClimateHistory';
-import { RecordExists } from 'pg-mem';
 import { DefensiveHistory } from '../entity/DefensiveHistory';
 
 const fieldRepository = DataSource.getRepository(Field);
