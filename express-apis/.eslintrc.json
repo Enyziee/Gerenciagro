@@ -6,7 +6,7 @@
 	"parserOptions": {
 		"project": ["./tsconfig.json"]
 	},
-	"ignorePatterns": ["**/dist/*"],
+	"ignorePatterns": ["**/dist/*", "*.js", "tests/*.ts"],
 	"rules": {
 		"import/extensions": 0,
 		"semi": "warn"

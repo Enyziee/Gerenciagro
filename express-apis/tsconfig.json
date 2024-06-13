@@ -1,5 +1,7 @@
 {
 	"compilerOptions": {
+		"incremental": true,
+		
 		"strict": true,
 		"target": "ES2022",
 		"module": "commonjs",
