@@ -36,6 +36,6 @@ export class User {
 	@UpdateDateColumn()
 	updatedAt!: number;
 
-	@OneToMany(() => Farm, (farm) => farm.user)
+	@OneToMany(() => Farm, (farm) => farm.user, { cascade: true })
 	farms!: Farm[];
 }

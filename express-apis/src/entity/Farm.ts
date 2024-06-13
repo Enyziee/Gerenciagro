@@ -44,6 +44,6 @@ export class Farm {
 	@ManyToOne(() => User, (user) => user.farms)
 	user!: User;
 
-	@OneToMany(() => Field, (field) => field.farm)
+	@OneToMany(() => Field, (field) => field.farm, { cascade: true })
 	fields!: Field[];
 }

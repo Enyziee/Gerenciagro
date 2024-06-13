@@ -8,14 +8,13 @@ import {
 	UpdateDateColumn,
 } from 'typeorm';
 import { Farm } from './Farm';
-import { ClimateHistory } from './ClimateHistory';
 import { DefensiveHistory } from './DefensiveHistory';
 
 @Entity({ name: 'Fields' })
 export class Field {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
-	
+
 	@Column({
 		type: 'varchar',
 		length: 32,
@@ -31,12 +30,12 @@ export class Field {
 		nullable: true,
 	})
 	latitude!: string;
-	
+
 	@Column({
 		nullable: true,
 	})
 	longitude!: string;
-	
+
 	@Column()
 	farmId!: string;
 
@@ -49,9 +48,6 @@ export class Field {
 	@ManyToOne(() => Farm, (farm) => farm.fields)
 	farm!: Farm;
 
-	@OneToMany(() => ClimateHistory, (climateHistory) => climateHistory.field)
-	climateHistory!: ClimateHistory[];
-
-	@OneToMany(() => DefensiveHistory, (defensiveHistory) => defensiveHistory.field)
+	@OneToMany(() => DefensiveHistory, (defensiveHistory) => defensiveHistory.field, { cascade: true })
 	defensiveHistory!: DefensiveHistory[];
 }

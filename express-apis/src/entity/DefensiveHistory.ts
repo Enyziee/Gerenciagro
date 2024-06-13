@@ -17,6 +17,6 @@ export class DefensiveHistory {
 	})
 	volume!: number;
 
-	@ManyToOne(() => Field, (field) => field.climateHistory)
+	@ManyToOne(() => Field, (field) => field.defensiveHistory)
 	field!: Field;
 }

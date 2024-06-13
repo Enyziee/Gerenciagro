@@ -3,7 +3,7 @@ import DataSource from '../db/DataSource';
 
 import { Request, Response } from 'express';
 
-import { createJWT, validadeJWT } from '../modules/authentication';
+import { createJWT, createRefreshToken, validadeJWT } from '../modules/authentication';
 import { User } from '../entity/User';
 
 const userRepository = DataSource.getRepository(User);
@@ -25,11 +25,13 @@ export async function login(req: Request, res: Response) {
 		}
 
 		const token = await createJWT(user);
+		const refreshData = createRefreshToken();
+		
 
 		return res.status(200).json({ access_token: token });
 	} catch (error) {
 		console.error('Something go wrong\n', error);
-		return res.status(500).json({ error: 'Internal Error' });
+		return res.status(500).json({ errors: 'Internal Error' });
 	}
 }
 
