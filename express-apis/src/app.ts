@@ -2,14 +2,15 @@ import 'reflect-metadata';
 
 import DataSource from './db/DataSource';
 import { createServer } from './modules/utils';
+import { EXPRESS_PORT } from './config';
 
-const PORT = process.env.EXPRESS_PORT ? process.env.EXPRESS_PORT : 3000;
+const PORT = EXPRESS_PORT;
 const app = createServer();
 
 DataSource.initialize()
 	.then(() => {
 		app.listen(PORT, async () => {
-			console.log(`Server listening on http://localhost:${PORT}`);
+			console.log(`API Server started`);
 		});
 	})
 	.catch((err: Error) => {

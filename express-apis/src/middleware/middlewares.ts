@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { validadeJWT } from '../modules/authentication';
 
+import { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
+
 export async function checkJWT(req: Request, res: Response, next: NextFunction) {
 	const bearer = req.headers.authorization;
 
@@ -23,7 +25,14 @@ export async function checkJWT(req: Request, res: Response, next: NextFunction) 
 		res.locals.claims = claims;
 		next();
 	} catch (err) {
-		console.error(err);
-		res.status(401).json({ message: 'Invalid Token' });
+		if (err instanceof TokenExpiredError) {
+			console.warn('JWT Expired');
+			return res.status(401).json({ message: 'JWT Expired' });
+		}
+		
+		if (err instanceof JsonWebTokenError) { 
+			console.warn('JWT invalid');
+			return res.status(401).json({ message: 'JWT invalid' });
+		}
 	}
 }

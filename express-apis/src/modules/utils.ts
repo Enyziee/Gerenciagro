@@ -107,7 +107,7 @@ export async function fetchWeatherData(latitude: string, longitude: string, days
 
 export function createServer(): Express {
 	const app = express();
-	app.use(morgan('short'));
+	app.use(morgan('dev'));
 	app.use(json());
 	app.use(urlencoded({ extended: true }));
 	app.use('/api', routes());

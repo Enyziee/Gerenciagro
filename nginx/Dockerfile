@@ -1,5 +1,7 @@
 FROM nginx:alpine
 
+ENV TZ=America/Sao_Paulo
+
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/default.conf.template /etc/nginx/templates/default.conf.template
 

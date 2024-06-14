@@ -21,6 +21,7 @@ RUN npm ci --omit-dev
 
 COPY --from=development /usr/src/app/dist ./dist
 
+ENV TZ=America/Sao_Paulo
 ENV NODE_ENV=production
 
 EXPOSE 3000
