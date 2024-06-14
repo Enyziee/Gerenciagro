@@ -10,7 +10,6 @@ export default new DataSource({
 	database: 'postgres',
 	password: 'y49Ewznf2Gtje',
 	entities: ['dist/entity/*.js'],
-	useUTC: true,
 	migrations: ['dist/db/migrations/*.js'],
-	logging: true,
+	logging: ['error'],
 });

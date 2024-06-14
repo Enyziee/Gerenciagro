@@ -5,16 +5,16 @@ export async function checkJWT(req: Request, res: Response, next: NextFunction) 
 	const bearer = req.headers.authorization;
 
 	if (!bearer) {
-		res.status(401);
-		res.json({ message: 'Unauthorized' });
+		res.status(401).json({ message: 'Authentication header not provided' });
+		console.log('Authentication header not provided');
 		return;
 	}
 
 	const [, token] = bearer.split(' ');
 
 	if (!token) {
-		res.status(401);
-		res.json({ message: 'Invalid Token' });
+		res.status(401).json({ message: 'Authentication JWT not provided' });
+		console.log('Authentication JWT not provided');
 		return;
 	}
 
@@ -22,9 +22,8 @@ export async function checkJWT(req: Request, res: Response, next: NextFunction) 
 		const claims = await validadeJWT(token);
 		res.locals.claims = claims;
 		next();
-	} catch (error) {
-		console.error(error);
-		res.status(401);
-		res.json({ message: 'Invalid Token' });
+	} catch (err) {
+		console.error(err);
+		res.status(401).json({ message: 'Invalid Token' });
 	}
 }

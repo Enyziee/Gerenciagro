@@ -19,7 +19,7 @@ export async function createNewField(req: Request, res: Response) {
 	});
 
 	if (!farm || farm.userId != userID) {
-		return res.status(404).json({ errors: 'Farm not found' });
+		return res.status(404).json({ message: 'Farm not found' });
 	}
 
 	const coords: string = req.body.coordinates;
@@ -28,7 +28,7 @@ export async function createNewField(req: Request, res: Response) {
 	const coordsMatch = regex.exec(coords);
 
 	if (!coordsMatch) {
-		return res.status(400).json({ errors: 'Invalid coordinates format' });
+		return res.status(400).json({ message: 'Invalid coordinates format' });
 	}
 
 	const field = fieldRepository.create();
@@ -44,7 +44,7 @@ export async function createNewField(req: Request, res: Response) {
 		await farmRepository.save(farm);
 	} catch (err) {
 		console.error('Error when saving a new field or updating farm', err);
-		return res.status(500).json({ errors: 'Internal Error' });
+		return res.status(500).json({ message: 'Internal Error' });
 	}
 
 	res.status(201).json({ message: 'Field created with success', data: { field_id: field.id } });
@@ -66,14 +66,14 @@ export async function getAllFieldsFromFarm(req: Request, res: Response) {
 	});
 
 	if (!farmWithField[0]) {
-		return res.status(404).json({ error: 'Resource not found' });
+		return res.status(404).json({ message: 'Resource not found' });
 	}
 
 	const fields = farmWithField[0].fields;
 
 	fields.forEach((field) => {
-		delete (field as { createdAt?: number }).createdAt;
-		delete (field as { updatedAt?: number }).updatedAt;
+		delete (field as { createdAt?: Date }).createdAt;
+		delete (field as { updatedAt?: Date }).updatedAt;
 		delete (field as { latitude?: string }).latitude;
 		delete (field as { longitude?: string }).longitude;
 		delete (field as { farmId?: string }).farmId;
@@ -102,7 +102,7 @@ export async function getField(req: Request, res: Response) {
 	});
 
 	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
-		return res.status(404).json({ error: 'Resource not found' });
+		return res.status(404).json({ message: 'Resource not found' });
 	}
 
 	return res.status(200).json({ data: farmWithField[0].fields[0] });
@@ -116,7 +116,7 @@ export async function getAllWeatherData(req: Request, res: Response) {
 	const days = parseInt(req.query.days!.toString());
 
 	if (days < 1 || days > 365) {
-		return res.status(400).json({ errors: 'Value out of range' });
+		return res.status(400).json({ message: 'Value out of range' });
 	}
 
 	const farmWithField = await farmRepository.find({
@@ -134,7 +134,7 @@ export async function getAllWeatherData(req: Request, res: Response) {
 	});
 
 	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
-		return res.status(404).json({ error: 'Resource not found' });
+		return res.status(404).json({ message: 'Resource not found' });
 	}
 
 	const field = farmWithField[0].fields[0];
@@ -144,7 +144,7 @@ export async function getAllWeatherData(req: Request, res: Response) {
 		res.status(200).json({ count: weatherData.length, data: weatherData });
 	} catch (err) {
 		console.error('Problem fetching weather data from OpenMeteo\n', err);
-		res.status(500).json({ error: err });
+		res.status(500).json({ message: err });
 	}
 }
 
@@ -168,7 +168,7 @@ export async function saveDefensiveRecord(req: Request, res: Response) {
 	});
 
 	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
-		return res.status(404).json({ error: 'Resource not found' });
+		return res.status(404).json({ message: 'Resource not found' });
 	}
 
 	const field = farmWithField[0].fields[0];
@@ -203,7 +203,7 @@ export async function getAllDefensivesRecords(req: Request, res: Response) {
 	});
 
 	if (!farmWithField[0] || !farmWithField[0].fields[0]) {
-		return res.status(404).json({ error: 'Resource not found' });
+		return res.status(404).json({ message: 'Resource not found' });
 	}
 
 	const defensives = farmWithField[0].fields[0].defensiveHistory;

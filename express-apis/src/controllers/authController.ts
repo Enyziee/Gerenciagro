@@ -3,105 +3,133 @@ import DataSource from '../db/DataSource';
 
 import { Request, Response } from 'express';
 
-import { JwtPayload } from 'jsonwebtoken';
-import { RefreshToken } from '../entity/refreshToken';
 import { User } from '../entity/User';
-import { createJWT, createRefreshToken, validadeJWT } from '../modules/authentication';
+import { decodeJWT } from '../modules/authentication';
+import { createAuthData, decodeHeader } from '../modules/utils';
 
-const userRepository = DataSource.getRepository(User);
-const refreshTokenRepo = DataSource.getRepository(RefreshToken);
+import { RefreshToken } from '../entity/refreshToken';
 
 export async function login(req: Request, res: Response) {
+	const userRepo = DataSource.getRepository(User);
+
 	try {
-		const user = await userRepository.findOneBy({
+		const user = await userRepo.findOneBy({
 			email: req.body.email,
 		});
 
 		if (!user) {
-			return res.status(401).json();
+			return res.status(401).json({ message: 'Invalid Credentials' });
 		}
 
 		const validPassword = await bcrypt.compare(req.body.password, user.password);
 
+		delete (user as { password?: string }).password;
+
 		if (!validPassword) {
-			return res.status(401).json({ errors: 'Invalid Credentials' });
+			return res.status(401).json({ message: 'Invalid Credentials' });
 		}
 
-		const accessToken = await createJWT(user);
-		const accessTokenData = (await validadeJWT(accessToken)) as JwtPayload;
-		const refreshData = createRefreshToken();
+		const authData = await createAuthData(user);
 
-		const refreshTokenEntity = refreshTokenRepo.create();
-		refreshTokenEntity.token = refreshData.token;
-		refreshTokenEntity.issuedAt = new Date(refreshData.issuedAt);
-		refreshTokenEntity.expiresAt = new Date(refreshData.expiresAt);
-		refreshTokenEntity.user = user;
-		refreshTokenRepo.save;
-
-		return res.status(200).json({
-			access_token: { token: accessToken, expireAt: accessTokenData.exp },
-			refresh_token: { token: refreshData.token, expireAt: refreshData.expiresAt },
-		});
-	} catch (error) {
-		console.error('Something go wrong\n', error);
-		return res.status(500).json({ errors: 'Internal Error' });
+		res.status(200).json({ data: authData });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: 'Internal Error' });
 	}
 }
 
 export async function register(req: Request, res: Response) {
-	const { name, email, password, address } = req.body;
+	const userRepo = DataSource.getRepository(User);
 
-	// TODO Adionar verificações extras para email;
-
-	const userExists = await userRepository.findOneBy({
-		email: email,
+	const user = await userRepo.findOneBy({
+		email: req.body.email,
 	});
 
-	if (userExists) {
+	if (user) {
 		console.warn('User already created');
 		return res.status(409).json({ message: 'User already exists' });
 	}
 
 	try {
 		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(password, salt);
+		const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
 		const user = new User();
-		user.name = name;
-		user.email = email;
-		user.address = address;
+		user.name = req.body.name;
+		user.email = req.body.email;
+		user.address = req.body.address;
 		user.password = hashedPassword;
 
-		const userSaved = await userRepository.save(user);
-		const token = await createJWT(userSaved);
+		const savedUser = await userRepo.save(user);
 
-		return res.status(201).json({ access_token: token, refresh_token: 'refresh_token' });
-	} catch (error) {
-		console.error(error);
-		return res.status(500).json({ error: 'Internal Error' });
+		res.status(201).json({ data: await createAuthData(savedUser) });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ message: 'Internal Error' });
 	}
 }
 
 export async function refreshJWT(req: Request, res: Response) {
-	const authHeader = req.headers.authorization;
-
-	const bearer = req.headers.authorization;
-
-	if (!bearer) {
-		res.status(401);
-		res.json({ message: 'Authorization Header not provided' });
-		return;
-	}
-
-	const [, token] = bearer.split(' ');
+	const token = decodeHeader(req, res);
 
 	if (!token) {
-		res.status(401);
-		res.json({ message: 'Access token not provided' });
 		return;
 	}
-	
-	const tokenPayload = validadeJWT(token);
 
-	res.send(200);
+	const userRepo = DataSource.getRepository(User);
+	const refreshRepo = DataSource.getRepository(RefreshToken);
+
+	try {
+		const tokenPayload = (await decodeJWT(token)) as { userid: string };
+
+		if (!tokenPayload) {
+			return res.status(400).json({ message: 'JWT invalid' });
+		}
+
+		const userId = tokenPayload.userid;
+
+		if (!userId) {
+			return res.status(400).json({ message: 'JWT invalid' });
+		}
+
+		const userData = await userRepo.find({
+			where: {
+				id: userId,
+			},
+
+			relations: {
+				refreshTokens: true,
+			},
+		});
+
+		if (userData.length == 0) {
+			console.log('User not found in the database');
+			return res.status(401).json({ message: 'Unauthorized' });
+		}
+
+		const refreshToken = userData[0].refreshTokens.find((token) => {
+			if (token.token == req.body.refresh_token) {
+				return token;
+			}
+		});
+
+		if (!refreshToken) {
+			console.log('Refresh token not found in the database');
+			return res.status(401).json({ message: 'Refresh token invalid' });
+		}
+
+		await refreshRepo.delete({
+			token: refreshToken.token,
+		});
+
+		if (new Date() > refreshToken.expiresAt) {
+			console.log('Refresh token expired');
+			return res.status(401).json({ message: 'Refresh token already expired' });
+		}
+
+		res.status(200).json({ data: await createAuthData(userData[0]) });
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ message: 'Internal error' });
+	}
 }

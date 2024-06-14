@@ -32,10 +32,10 @@ export class User {
 	address!: string;
 
 	@CreateDateColumn()
-	createdAt!: number;
+	createdAt!: Date;
 
 	@UpdateDateColumn()
-	updatedAt!: number;
+	updatedAt!: Date;
 
 	@OneToMany(() => Farm, (farm) => farm.user, { cascade: true })
 	farms!: Farm[];

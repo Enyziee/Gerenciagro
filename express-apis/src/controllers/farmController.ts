@@ -15,7 +15,7 @@ export async function createNewFarm(req: Request, res: Response) {
 	});
 
 	if (!user) {
-		return res.status(401).json({ errors: '' });
+		return res.status(401).json({ message: '' });
 	}
 
 	const farm = farmRepository.create({ name: name, user: user, address: address, numberOfFields: 0 });
@@ -30,7 +30,7 @@ export async function showFarm(req: Request, res: Response) {
 	});
 
 	if (!farm) {
-		return res.status(404).json({ error: 'Farm not found in the databases' });
+		return res.status(404).json({ message: 'Farm not found in the databases' });
 	}
 
 	res.status(200).json({ data: farm });
@@ -43,8 +43,8 @@ export async function showAllFarms(req: Request, res: Response) {
 	});
 
 	farms.forEach((farm) => {
-		delete (farm as { createdAt?: number }).createdAt;
-		delete (farm as { updatedAt?: number }).updatedAt;
+		delete (farm as { createdAt?: Date }).createdAt;
+		delete (farm as { updatedAt?: Date }).updatedAt;
 		delete (farm as { userId?: string }).userId;
 	});
 

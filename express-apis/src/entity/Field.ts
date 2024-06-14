@@ -40,10 +40,10 @@ export class Field {
 	farmId!: string;
 
 	@CreateDateColumn()
-	createdAt!: number;
+	createdAt!: Date;
 
 	@UpdateDateColumn()
-	updatedAt!: number;
+	updatedAt!: Date;
 
 	@ManyToOne(() => Farm, (farm) => farm.fields)
 	farm!: Farm;

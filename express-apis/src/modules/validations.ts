@@ -7,8 +7,7 @@ import { Farm } from '../entity/Farm';
 export function validationErrorHandler(req: Request, res: Response, next: NextFunction) {
 	const result = validationResult(req);
 	if (!result.isEmpty()) {
-		res.status(400);
-		return res.json({ errors: result.array() });
+		return res.status(400).json({ message: result.array() });
 	}
 
 	next();

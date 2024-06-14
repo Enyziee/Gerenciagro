@@ -33,10 +33,10 @@ export class Farm {
 	numberOfFields!: number;
 
 	@CreateDateColumn()
-	createdAt!: number;
+	createdAt!: Date;
 
 	@UpdateDateColumn()
-	updatedAt!: number;
+	updatedAt!: Date;
 
 	@Column()
 	userId!: string;

@@ -6,10 +6,14 @@ export class RefreshToken {
 	@PrimaryColumn()
 	token!: string;
 
-	@Column()
+	@Column({
+		type: 'timestamp',
+	})
 	valid!: boolean;
 
-	@Column()
+	@Column({
+		type: 'timestamp',
+	})
 	issuedAt!: Date;
 
 	@Column()

@@ -1,13 +1,59 @@
-import express, { json, Response, urlencoded, type Express } from 'express';
+import express, { json, Request, Response, urlencoded, type Express } from 'express';
+import { JwtPayload } from 'jsonwebtoken';
 import morgan from 'morgan';
-import routes from '../routes';
 import { fetchWeatherApi } from 'openmeteo';
-import { Farm } from '../entity/Farm';
+import { User } from '../entity/User';
+import routes from '../routes';
+import { createJWT, createRefreshToken, validadeJWT } from './authentication';
 
 type weatherRecord = {
 	timestamp: string;
 	precipitation: number;
 };
+
+export function decodeHeader(req: Request, res: Response) {
+	const authHeader = req.headers.authorization;
+
+	const bearer = req.headers.authorization;
+
+	if (!bearer) {
+		res.status(401);
+		res.json({ message: 'Authentication header not provided' });
+		console.log('Authentication header not provided');
+		return;
+	}
+
+	const [, token] = bearer.split(' ');
+
+	if (!token) {
+		res.status(401);
+		res.json({ message: 'Authentication JWT not provided' });
+		console.log('Authentication JWT not provided');
+		return;
+	}
+
+	return token;
+}
+
+export async function createAuthData(user: User) {
+	const accessToken = await createJWT(user);
+	const accessTokenData = (await validadeJWT(accessToken)) as JwtPayload;
+	const refreshData = createRefreshToken(user);
+
+	delete (user as { password?: string }).password;
+	delete (user as { updatedAt?: Date }).updatedAt;
+	return {
+		access_token: { token: accessToken, expireAt: accessTokenData.exp as number },
+		refresh_token: { token: refreshData.token, expireAt: Math.floor(refreshData.expiresAt.getTime() / 1000) },
+		user_data: {
+			id: user.id,
+			email: user.email,
+			name: user.name,
+			address: user.address,
+			createdAt: user.createdAt,
+		},
+	};
+}
 
 export async function fetchWeatherData(latitude: string, longitude: string, days: number) {
 	const myDate = new Date();
@@ -61,7 +107,7 @@ export async function fetchWeatherData(latitude: string, longitude: string, days
 
 export function createServer(): Express {
 	const app = express();
-	app.use(morgan('dev'));
+	app.use(morgan('short'));
 	app.use(json());
 	app.use(urlencoded({ extended: true }));
 	app.use('/api', routes());

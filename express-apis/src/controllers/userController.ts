@@ -10,7 +10,7 @@ export async function showUserInfo(req: Request, res: Response) {
 	});
 
 	if (!(user instanceof User)) {
-		return res.status(404).json({ error: 'User not found' });
+		return res.status(404).json({ message: 'User not found' });
 	}
 
 	delete (user as { password?: string }).password;
