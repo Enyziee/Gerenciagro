@@ -10,7 +10,7 @@ const app = createServer();
 DataSource.initialize()
 	.then(() => {
 		app.listen(PORT, async () => {
-			console.log(`API Server started`);
+			console.log(`API Server started at port:${PORT}`);
 		});
 	})
 	.catch((err: Error) => {
