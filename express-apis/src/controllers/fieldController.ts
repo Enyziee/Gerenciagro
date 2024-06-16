@@ -51,13 +51,14 @@ export async function createNewField(req: Request, res: Response) {
 }
 
 export async function updateFieldInfo(req: Request, res: Response) {
-	const userID = res.locals.claims;
+	const userID = res.locals.claims.userid;
 	const farmID = req.params.farmid;
 	const fieldID = req.params.fieldid;
 
 	const farmWithField = await farmRepository.find({
 		where: {
 			id: farmID,
+			userId: userID,
 			fields: {
 				id: fieldID,
 			},
@@ -103,10 +104,54 @@ export async function updateFieldInfo(req: Request, res: Response) {
 		return res.status(500).json({ message: 'Cannot update the field data' });
 	}
 
-	res.status(200).json({ data: field });
+	res.status(200).json({ message: 'Field updated with success' });
 }
 
-export async function deleteField(req: Request, res: Response) {}
+export async function deleteField(req: Request, res: Response) {
+	const userID = res.locals.claims.userid;
+	const farmID = req.params.farmid;
+	const fieldID = req.params.fieldid;
+
+	const farmWithField = await farmRepository.find({
+		where: {
+			id: farmID,
+			userId: userID,
+			fields: {
+				id: fieldID,
+			},
+		},
+
+		relations: {
+			fields: true,
+		},
+	});
+
+	if (farmWithField.length == 0) {
+		return res.status(404).json({ message: 'Resource not found' });
+	}
+
+	const field = farmWithField[0].fields[0];
+
+	try {
+		await fieldRepository.delete({ id: fieldID });
+		const farm = await farmRepository.findOneBy({
+			id: farmID,
+			userId: userID,
+		});
+
+		if (!farm) {
+			throw new Error('Farm not found to update the number of');
+		}
+
+		farm.numberOfFields--;
+		await farmRepository.save(farm);
+	} catch (err) {
+		console.error('Cannot delete the field', err);
+		return res.status(500).json({ message: 'Cannot delete the field' });
+	}
+
+	res.status(200).json({ message: 'Field deleted with success' });
+}
 
 export async function getAllFieldsFromFarm(req: Request, res: Response) {
 	const userID = res.locals.claims.userid;

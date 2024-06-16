@@ -5,6 +5,7 @@ import { body, param, query } from 'express-validator';
 import { validationErrorHandler } from '../modules/validations';
 import {
 	createNewField,
+	deleteField,
 	getAllDefensivesRecords,
 	getAllFieldsFromFarm,
 	getAllWeatherData,
@@ -84,7 +85,7 @@ export default (router: Router) => {
 		checkJWT,
 		getAllDefensivesRecords,
 	);
-	
+
 	router.put(
 		'/farms/:farmid/fields/:fieldid/',
 		param('farmid').isUUID(),
@@ -93,10 +94,20 @@ export default (router: Router) => {
 		body('name').optional().isString(),
 		body('size').optional().isNumeric(),
 		body('coordinates').optional().isString(),
-		
+
 		validationErrorHandler,
 		checkJWT,
 		updateFieldInfo,
 	);
-	
+
+	router.delete(
+		'/farms/:farmid/fields/:fieldid/',
+
+		param('farmid').isUUID(),
+		param('fieldid').isUUID(),
+
+		validationErrorHandler,
+		checkJWT,
+		deleteField,
+	);
 };

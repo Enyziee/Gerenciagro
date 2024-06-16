@@ -18,7 +18,34 @@ export async function showUserInfo(req: Request, res: Response) {
 }
 
 export async function updateUserInfo(req: Request, res: Response) {
-	res.json({ message: 'Not implemented' });
+	const user = await userRepository.findOneBy({
+		id: res.locals.claims.userid,
+	});
+
+	if (!user) {
+		return res.status(404).json({ message: 'User not found' });
+	}
+
+	if (req.body.name && req.body.name > 0) {
+		user.name = req.body.name;
+	}
+
+	if (req.body.email) {
+		user.email = req.body.email;
+	}
+
+	if (req.body.address && req.body.address > 0) {
+		user.address = req.body.address;
+	}
+
+	try {
+		await userRepository.save(user);
+	} catch (err) {
+		console.error('Cannot update user data', err);
+		return res.status(500).json({ message: 'Cannot update user data' });
+	}
+
+	res.status(200).json({ message: 'User data updated with success' });
 }
 
 export async function deleteUserFromJWT(req: Request, res: Response) {
