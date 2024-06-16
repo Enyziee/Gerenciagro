@@ -10,6 +10,7 @@ import {
 	getAllWeatherData,
 	getField,
 	saveDefensiveRecord,
+	updateFieldInfo,
 } from '../controllers/fieldController';
 
 export default (router: Router) => {
@@ -83,4 +84,19 @@ export default (router: Router) => {
 		checkJWT,
 		getAllDefensivesRecords,
 	);
+	
+	router.put(
+		'/farms/:farmid/fields/:fieldid/',
+		param('farmid').isUUID(),
+		param('fieldid').isUUID(),
+
+		body('name').optional().isString(),
+		body('size').optional().isNumeric(),
+		body('coordinates').optional().isString(),
+		
+		validationErrorHandler,
+		checkJWT,
+		updateFieldInfo,
+	);
+	
 };
