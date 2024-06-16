@@ -6,7 +6,8 @@
 	"scripts": {
 		"test": "NODE_ENV=testing jest",
 		"build": "tsc --build",
-		"dev": "tsc && node --require dotenv/config ./dist/app.js",
+		"start": "tsc && node --require dotenv/config ./dist/app.js",
+		"dev": "tsc-watch --onSuccess 'node --require dotenv/config dist/app.js'",
 		"clear": "rm -rf dist/",
 		"typeorm:generate": "typeorm-ts-node-commonjs migration:generate src/db/migrations/migration -d src/db/DataSource.ts",
 		"typeorm:migrate": "typeorm-ts-node-commonjs migration:run -d src/db/DataSource.ts",
@@ -29,6 +30,7 @@
 		"@typescript-eslint/parser": "^7.13.0",
 		"dotenv": "^16.4.5",
 		"ts-node": "^10.9.2",
+		"tsc-watch": "^6.2.0",
 		"typescript": "^5.4.5"
 	},
 	"dependencies": {
