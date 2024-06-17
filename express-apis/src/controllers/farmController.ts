@@ -35,6 +35,37 @@ export async function showFarm(req: Request, res: Response) {
 
 	res.status(200).json({ data: farm });
 }
+
+export async function updateFarmInfo(req: Request, res: Response) {
+	const userID = res.locals.claims.userid;
+	const farmID = req.params.farmid;
+
+	const farm = await farmRepository.findOneBy({
+		id: farmID,
+		userId: userID,
+	});
+
+	if (!farm) {
+		return res.status(404).json({ message: 'Farm not found' });
+	}
+
+	if (req.body.name && req.body.name.length > 0) {
+		farm.name = req.body.name;
+	}
+
+	if (req.body.address && req.body.address.length > 0) {
+		farm.address = req.body.address;
+	}
+
+	try {
+		await farmRepository.save(farm);
+		res.json({ message: 'Farm data updated with success' });
+	} catch (err) {
+		console.error('Cannot update the farm data', err);
+		return res.status(500).json({ message: 'Cannot update the farm data' });
+	}
+}
+
 export async function showAllFarms(req: Request, res: Response) {
 	const farms = await farmRepository.findBy({
 		user: {
@@ -49,4 +80,26 @@ export async function showAllFarms(req: Request, res: Response) {
 	});
 
 	res.status(200).json({ data: farms });
+}
+
+export async function deleteFarm(req: Request, res: Response) {
+	const userID = res.locals.claims.userid;
+	const farmID = req.params.farmid;
+
+	const farm = await farmRepository.existsBy({
+		id: farmID,
+		userId: userID,
+	});
+
+	if (!farm) {
+		return res.status(404).json({ message: 'Farm not found' });
+	}
+
+	try {
+		await farmRepository.delete({ id: farmID });
+		return res.status(200).json({ message: 'Farm deleted with success' });
+	} catch (error) {
+		console.error('Cannot delete the farm');
+		return res.status(500).json({ message: 'Cannot delete the farm' });
+	}
 }
