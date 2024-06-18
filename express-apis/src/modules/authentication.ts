@@ -22,7 +22,6 @@ export function createRefreshToken(user: User) {
 
 	const refreshTokenEntity = refreshTokenRepo.create();
 	refreshTokenEntity.token = randomBytes(16).toString('hex');
-	refreshTokenEntity.valid = true;
 	refreshTokenEntity.issuedAt = new Date();
 	refreshTokenEntity.expiresAt = new Date((Date.now() + (86400 * 1000)));
 	refreshTokenEntity.user = user;

@@ -37,7 +37,7 @@ export class User {
 	@UpdateDateColumn()
 	updatedAt!: Date;
 
-	@OneToMany(() => Farm, (farm) => farm.user, { cascade: true })
+	@OneToMany(() => Farm, (farm) => farm.user, { cascade: true, onDelete: 'CASCADE'})
 	farms!: Farm[];
 
 	@OneToMany(() => RefreshToken, (token) => token.user)

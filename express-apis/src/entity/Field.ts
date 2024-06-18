@@ -48,6 +48,6 @@ export class Field {
 	@ManyToOne(() => Farm, (farm) => farm.fields)
 	farm!: Farm;
 
-	@OneToMany(() => DefensiveHistory, (defensiveHistory) => defensiveHistory.field, { cascade: true })
+	@OneToMany(() => DefensiveHistory, (defensiveHistory) => defensiveHistory.field, { cascade: true, onDelete: 'CASCADE' })
 	defensiveHistory!: DefensiveHistory[];
 }
