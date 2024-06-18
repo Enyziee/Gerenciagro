@@ -40,12 +40,11 @@ export async function updateUserInfo(req: Request, res: Response) {
 
 	try {
 		await userRepository.save(user);
+		res.status(200).json({ message: 'User data updated with success' });
 	} catch (err) {
 		console.error('Cannot update user data', err);
 		return res.status(500).json({ message: 'Cannot update user data' });
 	}
-
-	res.status(200).json({ message: 'User data updated with success' });
 }
 
 export async function deleteUserFromJWT(req: Request, res: Response) {

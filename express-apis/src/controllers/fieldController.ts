@@ -140,7 +140,7 @@ export async function deleteField(req: Request, res: Response) {
 		});
 
 		if (!farm) {
-			throw new Error('Farm not found to update the number of');
+			throw new Error('Farm not found to update the number of fields');
 		}
 
 		farm.numberOfFields--;
