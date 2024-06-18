@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import DataSource from '../db/DataSource';
 import { Farm } from '../entity/Farm';
 import { User } from '../entity/User';
+import { Field } from '../entity/Field';
+import { DefensiveHistory } from '../entity/DefensiveHistory';
 
 const farmRepository = DataSource.getRepository(Farm);
 const userRepository = DataSource.getRepository(User);
@@ -83,23 +85,44 @@ export async function showAllFarms(req: Request, res: Response) {
 }
 
 export async function deleteFarm(req: Request, res: Response) {
+	const fieldRepository = DataSource.getRepository(Field);
+	const defensiveRepository = DataSource.getRepository(DefensiveHistory);
+
 	const userID = res.locals.claims.userid;
 	const farmID = req.params.farmid;
 
-	const farm = await farmRepository.findOneBy({
-		id: farmID,
-		userId: userID,
+	const farms = await farmRepository.find({
+		where: {
+			id: farmID,
+			userId: userID,
+		},
+
+		relations: {
+			fields: {
+				defensiveHistory: true,
+			},
+		},
 	});
 
-	if (!farm) {
+	if (farms.length == 0) {
 		return res.status(404).json({ message: 'Farm not found' });
 	}
 
+	const farm = farms[0];
+
 	try {
-		farmRepository.remove(farm);
+		farm.fields.forEach(async (field) => {
+			field.defensiveHistory.forEach(async (defensiveRecord) => {
+				await defensiveRepository.remove(defensiveRecord);
+			});
+
+			await fieldRepository.remove(field);
+		});
+
+		await farmRepository.remove(farm);
 		return res.status(200).json({ message: 'Farm deleted with success' });
-	} catch (error) {
-		console.error('Cannot delete the farm');
+	} catch (err) {
+		console.error('Cannot delete the farm', err);
 		return res.status(500).json({ message: 'Cannot delete the farm' });
 	}
 }

@@ -108,6 +108,8 @@ export async function updateFieldInfo(req: Request, res: Response) {
 }
 
 export async function deleteField(req: Request, res: Response) {
+	const defensiveRepository = DataSource.getRepository(DefensiveHistory);
+	
 	const userID = res.locals.claims.userid;
 	const farmID = req.params.farmid;
 	const fieldID = req.params.fieldid;
@@ -122,7 +124,10 @@ export async function deleteField(req: Request, res: Response) {
 		},
 
 		relations: {
-			fields: true,
+			fields: {
+				defensiveHistory: true,
+			},
+			
 		},
 	});
 
@@ -133,7 +138,12 @@ export async function deleteField(req: Request, res: Response) {
 	const field = farmWithField[0].fields[0];
 
 	try {
-		await fieldRepository.delete({ id: fieldID });
+		field.defensiveHistory.forEach(async defensiveRecord => {
+			await defensiveRepository.remove(defensiveRecord);
+		});
+		
+		
+		await fieldRepository.remove(field);
 		const farm = await farmRepository.findOneBy({
 			id: farmID,
 			userId: userID,
