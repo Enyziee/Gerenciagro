@@ -86,7 +86,7 @@ export async function deleteFarm(req: Request, res: Response) {
 	const userID = res.locals.claims.userid;
 	const farmID = req.params.farmid;
 
-	const farm = await farmRepository.existsBy({
+	const farm = await farmRepository.findOneBy({
 		id: farmID,
 		userId: userID,
 	});
@@ -96,7 +96,7 @@ export async function deleteFarm(req: Request, res: Response) {
 	}
 
 	try {
-		await farmRepository.delete({ id: farmID });
+		farmRepository.remove(farm);
 		return res.status(200).json({ message: 'Farm deleted with success' });
 	} catch (error) {
 		console.error('Cannot delete the farm');
