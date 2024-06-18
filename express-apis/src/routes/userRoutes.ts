@@ -10,9 +10,9 @@ export default (router: express.Router) => {
 
 	router.put(
 		'/users',
-		body('name').notEmpty().optional(),
-		body('email').isEmail().optional(),
-		body('address').notEmpty().optional(),
+		body('name').optional({ values: 'falsy' }).notEmpty(),
+		body('email').optional({ values: 'falsy' }).isEmail(),
+		body('address').optional({ values: 'falsy' }).notEmpty(),
 
 		validationErrorHandler,
 		checkJWT,

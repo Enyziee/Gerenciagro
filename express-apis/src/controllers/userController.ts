@@ -26,7 +26,7 @@ export async function updateUserInfo(req: Request, res: Response) {
 		return res.status(404).json({ message: 'User not found' });
 	}
 
-	if (req.body.name && req.body.name > 0) {
+	if (req.body.name && req.body.name.length > 0) {
 		user.name = req.body.name;
 	}
 
@@ -34,7 +34,7 @@ export async function updateUserInfo(req: Request, res: Response) {
 		user.email = req.body.email;
 	}
 
-	if (req.body.address && req.body.address > 0) {
+	if (req.body.address && req.body.address.length > 0) {
 		user.address = req.body.address;
 	}
 
