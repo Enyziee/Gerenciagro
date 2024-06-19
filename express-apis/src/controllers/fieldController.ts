@@ -323,3 +323,7 @@ export async function getAllDefensivesRecords(req: Request, res: Response) {
 
 	res.status(200).json({ data: defensives });
 }
+
+export async function deleteDefensiveRecord(req: Request, res: Response) {
+	
+}

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { checkJWT } from '../middleware/middlewares';
-import { createNewFarm, deleteFarm, showAllFarms, showFarm, updateFarmInfo } from '../controllers/farmController';
+import { createNewFarm, deleteAgrodefensive, deleteFarm, showAllFarms, showFarm, updateFarmInfo } from '../controllers/farmController';
 import { body, param, query } from 'express-validator';
 import { validationErrorHandler } from '../modules/validations';
 import {
@@ -128,5 +128,15 @@ export default (router: Router) => {
 		validationErrorHandler,
 		checkJWT,
 		deleteFarm
+	)
+	
+	router.delete(
+		'/farms/:farmid/fields/:fieldid/agrodefensives/:defensiveid',
+		param('farmid').isUUID(),
+		param('fieldid').isUUID(),
+		param('defensiveid').isUUID(),
+		validationErrorHandler,
+		checkJWT,
+		deleteAgrodefensive,
 	)
 };

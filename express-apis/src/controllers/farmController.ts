@@ -126,3 +126,44 @@ export async function deleteFarm(req: Request, res: Response) {
 		return res.status(500).json({ message: 'Cannot delete the farm' });
 	}
 }
+
+export async function deleteAgrodefensive(req: Request, res: Response) {
+	const defensiveRepository = DataSource.getRepository(DefensiveHistory);
+
+	const userID = res.locals.claims.userid;
+	const farmID = req.params.farmid;
+	const fieldID = req.params.fieldid;
+	const defensiveID = req.params.defensiveid;
+
+	const resource = await farmRepository.exists({
+		where: {
+			id: farmID,
+			userId: userID,
+			fields: {
+				id: fieldID,
+				defensiveHistory: {
+					id: defensiveID,
+				},
+			},
+		},
+
+		relations: {
+			fields: {
+				defensiveHistory: true,
+			},
+		},
+	});
+
+	if (!resource) {
+		console.log('Resource not found when trying to delete agrodefensive');
+		return res.status(404).json({ message: 'Resource not found' });
+	}
+
+	try {
+		await defensiveRepository.delete({ id: defensiveID });
+		return res.status(200).json({ message: 'Defensive deleted with success' });
+	} catch (err) {
+		console.error('Cannot delete defensive', err);
+		return res.status(500).json({ message: 'Cannot delete defensive' });
+	}
+}
